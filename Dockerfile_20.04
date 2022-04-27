@@ -74,6 +74,9 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get update && apt-get install -y ccache
 ENV ENV_RUN_SCRIPT="export CCACHE_DIR=/ccache; export CCACHE_EXEC=/usr/bin/ccache; export USE_CCACHE=true"
 
+# needed by https://github.com/android-rpi/kernel_manifest
+RUN apt-get update && apt-get install -y rsync
+
 RUN curl https://storage.googleapis.com/git-repo-downloads/repo > /bin/repo && chmod a+rx /bin/repo
 
 # Update to latest
