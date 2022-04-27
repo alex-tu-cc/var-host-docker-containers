@@ -1,7 +1,6 @@
 #!/bin/bash -e
 # SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 # Copyright 2021 Variscite Ltd.
-
 readonly FILE_SCRIPT="$(basename "$0")"
 readonly DIR_SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 readonly GIT_COMMIT="$(git --git-dir=${DIR_SCRIPT}/.git log -1 --format=%h)"
@@ -79,7 +78,7 @@ parse_args() {
                 shift
             ;;
             -b|--build)
-                build_image
+                BUILD_IMAGE="true"
                 shift
             ;;
             -f|--force-build)
@@ -147,7 +146,7 @@ if [ ! -f /usr/bin/qemu-aarch64-static ]; then
 fi
 
 # Build container
-if ! docker images | grep -q "${DOCKER_IMAGE}" || [ -n "$BUILD_CACHE" ]; then
+if ! docker images | grep -q "${DOCKER_IMAGE}" || [ -n "$BUILD_CACHE" ] || [ "$BUILD_IMAGE" = "true" ] ; then
     build_image "Dockerfile_${UBUNTU_VERSION}"
 fi
 
@@ -168,7 +167,7 @@ docker run --rm -e HOST_USER_ID=$uid -e HOST_USER_GID=$gid \
     -v ~/.gitconfig:/home/vari/.gitconfig \
     -v /usr/src:/usr/src \
     -v /lib/modules:/lib/modules \
-    -v /linux-kernel:/linux-kernel \
+    -v /srv/data/@ccache:/ccache \
     ${DOCKER_VOLUMES} \
     ${INTERACTIVE} \
     ${ENV_FILE} \
