@@ -10,7 +10,7 @@ RUN apt-get install -y sudo openssl apt-utils
 WORKDIR /workdir
 
 # Define username and temporary uid and gid
-ENV USER=vari USER_ID=1000 USER_GID=1000
+ENV USER=u USER_ID=1000 USER_GID=1000
 
 # now creating user, change password to 'ubuntu'
 RUN groupadd --gid "${USER_GID}" "${USER}" && \
@@ -72,7 +72,7 @@ RUN apt-get update && apt-get install -y \
 
 # ccache
 RUN apt-get update && apt-get install -y ccache
-ENV ENV_RUN_SCRIPT="export CCACHE_DIR=/ccache; export CCACHE_EXEC=/usr/bin/ccache; export USE_CCACHE=true"
+ENV ENV_RUN_SCRIPT="export CCACHE_DIR=/ccache; export CCACHE_EXEC=/usr/bin/ccache; export USE_CCACHE=true; export OUT_DIR=/out"
 
 # needed by https://github.com/android-rpi/kernel_manifest
 RUN apt-get update && apt-get install -y rsync
