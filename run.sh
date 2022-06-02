@@ -161,10 +161,13 @@ if [ ! -f ${HOME}/.gitconfig ]; then
     exit -1
 fi
 
+## leave the operation of creating outdir to docker entry script so that workaround permission issue.
+#OUTDIR="/srv/data/@android_out/$(basename $WORKDIR)-`date +"%Y%m%d-%H%M"`"
+#mkdir -p $OUTDIR
+
+# the --security-opt is to workaround an error in docker (https://issuetracker.google.com/issues/123210688?pli=1)
 docker run --rm -e HOST_USER_ID=$uid -e HOST_USER_GID=$gid \
-    -v ~/.ssh:/home/vari/.ssh \
     -v ${WORKDIR}:/workdir \
-    -v ~/.gitconfig:/home/vari/.gitconfig \
     -v /usr/src:/usr/src \
     -v /lib/modules:/lib/modules \
     -v /srv/data/@ccache:/ccache \
@@ -172,4 +175,5 @@ docker run --rm -e HOST_USER_ID=$uid -e HOST_USER_GID=$gid \
     ${INTERACTIVE} \
     ${ENV_FILE} \
     ${PRIVLEGED} \
+    --security-opt apparmor=unconfined --security-opt seccomp=unconfined --security-opt systempaths=unconfined \
     variscite:${DOCKER_IMAGE}

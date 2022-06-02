@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 # Copyright 2021 Variscite Ltd.
 
+set -x
+
 # verify container user was set in dockerfile
 if [ -z "${USER}" ]; then
   echo "Set user in Dockerfile";
@@ -18,6 +20,7 @@ fi
 # replace uid and guid in /etc/passwd and /etc/group
 sed -i -e "s/^${USER}:\([^:]*\):[0-9]*:[0-9]*/${USER}:\1:${HOST_USER_ID}:${HOST_USER_GID}/"  /etc/passwd
 sed -i -e "s/^${USER}:\([^:]*\):[0-9]*/${USER}:\1:${HOST_USER_GID}/"  /etc/group
+chown ${HOST_USER_ID}:${HOST_USER_GID} /home/${USER}
 
 # allow user to run sudo
 adduser ${USER} sudo
@@ -31,9 +34,17 @@ fi
 #change to /workdir after login
 echo "cd /workdir" > /home/${USER}/.bashrc
 
+#create out dir
+#OUTDIR=$(basename $EXT_OUTDIR)
+#mkdir -p /out/$OUTDIR
+#chown $HOST_USER_ID:$HOST_USER_GID /out/$OUTDIR
+#echo "export OUT_DIR=/out/$OUTDIR" >> /home/${USER}/.bashrc
+
 # If ENV_RUN_SCRIPT set in Docker Environment, run it after login
 if [ ! "${ENV_RUN_SCRIPT}" = "" ]; then
     echo "${ENV_RUN_SCRIPT}" >> /home/${USER}/.bashrc
 fi
 
 su - "${USER}"
+echo "testing"
+id
